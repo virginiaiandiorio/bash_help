@@ -30,6 +30,16 @@ context() {
     dspprod)
       kubectl config use aks-agrimetrics-dsp-prod-uks-001 && \
       export KUBE_CTX_ALIAS=dspprod && \
+      export KUBE_CTX_COLOR="31" ;;        # Red
+
+    agmdev)
+      kubectl config use aks-agrimetrics-dev-uksouth-001 && \
+      export KUBE_CTX_ALIAS=agmdev && \
+      export KUBE_CTX_COLOR="95" ;;        # Pink
+
+    agmprod)
+      kubectl config use aks-agrimetrics-prod-uksouth-001 && \
+      export KUBE_CTX_ALIAS=agmprod && \
       export KUBE_CTX_COLOR="35" ;;        # Purple
 
     *)
