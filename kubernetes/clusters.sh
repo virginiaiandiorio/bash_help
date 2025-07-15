@@ -46,4 +46,6 @@ context() {
       echo "Unknown alias: $alias_name"
       return 1 ;;
   esac
+  # PS1="\u@\h\[\033[${KUBE_CTX_COLOR}m\][$KUBE_CTX_ALIAS]\[\033[0m\]:\w\$ " This line changes just the env
+  PS1="\[\033[${KUBE_CTX_COLOR}m\]\u@\h[$KUBE_CTX_ALIAS]\[\033[0m\]:\w\$ " # This line changes the whole name string to the colour
 }
