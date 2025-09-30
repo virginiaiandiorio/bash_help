@@ -1,4 +1,6 @@
-alias khelp='cat /home/virginia/.bash_help/kubernetes/kubernetes_commands.sh'
+alias khelp='cat $HOME/repositories/bash_help/kubernetes/kubernetes_commands.sh'
+
+
 
 alias k='kubectl'
 alias kg='kubectl get'
