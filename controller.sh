@@ -1,3 +1,5 @@
-source ~/.bash_help/general_help/repeat_command.sh
-source ~/.bash_help/kubernetes/clusters.sh
-source ~/.bash_help/kubernetes/kubernetes_commands.sh
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+source "$SCRIPT_DIR/general_help/repeat_command.sh"
+source "$SCRIPT_DIR/kubernetes/clusters.sh"
+source "$SCRIPT_DIR/kubernetes/kubernetes_commands.sh"
