@@ -15,8 +15,7 @@ alias gpods='kubectl get pods -n dsp-geoserver'
 alias gjob='kubectl get job -n dsp-geoserver'
 alias gjobd='kubectl describe job -n dsp-geoserver'
 alias gjobdelete='kubectl delete job sync-geoserver-config -n dsp-geoserver'
-alias jobapplydev='cd ~/repositories/geoserver && kubectl -n dsp-geoserver apply -f k8s_test_deploy/sync-dsp-geoserver-config.yaml'
-alias jobapplyprod='cd ~/repositories/geoserver && kubectl -n dsp-geoserver apply -f k8s_live_deploy/sync-dsp-geoserver-config.yaml'
+alias jobapply='cd ~/repositories/geoserver && kubectl -n dsp-geoserver apply -f k8s_sync_pods/sync-dsp-geoserver-config.yaml'
 alias kroll='kubectl rollout restart deployment geoserver-read -n dsp-geoserver'
 
 
