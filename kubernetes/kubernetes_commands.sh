@@ -35,3 +35,20 @@ ks() {
   echo "Running: kubectl scale deployment $deployment --replicas=$replicas $*"
   kubectl scale deployment "$deployment" --replicas="$replicas" "$@"
 }
+
+kclean() {
+  if [[ "$1" == "--help" || "$1" == "-h" || $# -lt 2 ]]; then
+    echo "Usage: kclean <namespace> <state>"
+    echo "Example:"
+    echo "  kclean dsp-geoserver Error"
+    echo "  # Deletes all pods in dsp-geoserver with state 'Error'"
+    return 0
+  fi
+
+  local namespace=$1
+  local state=$2
+  shift 2
+
+  echo "Running: kubectl delete pod -n $namespace \$(kubectl get pods -n $namespace --no-headers | awk -v s=\"$state\" '\$3==s {print \$1}')"
+  kubectl delete pod -n "$namespace" $(kubectl get pods -n "$namespace" --no-headers | awk -v s="$state" '$3==s {print $1}')
+}
