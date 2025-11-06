@@ -52,3 +52,21 @@ kclean() {
   echo "Running: kubectl delete pod -n $namespace \$(kubectl get pods -n $namespace --no-headers | awk -v s=\"$state\" '\$3==s {print \$1}')"
   kubectl delete pod -n "$namespace" $(kubectl get pods -n "$namespace" --no-headers | awk -v s="$state" '$3==s {print $1}')
 }
+
+kdecrypt() {
+  if [[ "$1" == "--help" || "$1" == "-h" || $# -lt 3 ]]; then
+    echo "Usage: ksecret <namespace> <secret-name> <key>"
+    echo "Example:"
+    echo "  kdecrypt dsp-cde-graphdb-endpoint-blue endpoint dsp"
+    echo "  # Prints the decoded value of 'endpoint' from the given secret"
+    return 0
+  fi
+
+  local secret_name=$1
+  local key=$2
+  local namespace=$3
+
+  echo "Fetching '$key' from secret '$secret_name' in namespace '$namespace'..."
+  kubectl get secret "$secret_name" -n "$namespace" -o jsonpath="{.data.$key}" | base64 --decode
+  echo
+}
