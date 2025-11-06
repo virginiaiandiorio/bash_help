@@ -1,6 +1,6 @@
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 alias khelp='cat $HOME/repositories/bash_help/kubernetes/kubernetes_commands.sh'
-
-
 
 alias k='kubectl'
 alias kg='kubectl get'
@@ -70,3 +70,48 @@ kdecrypt() {
   kubectl get secret "$secret_name" -n "$namespace" -o jsonpath="{.data.$key}" | base64 --decode
   echo
 }
+
+kencrypt() {
+  if [[ $# -lt 4 ]]; then
+    echo "Usage: kencrypt <name> <namespace> <key> <value>"
+    return 1
+  fi
+
+  local name=$1
+  local namespace=$2
+  local key=$3
+  local value=$4
+  local file="$SCRIPT_DIR/tempsecret.yaml"
+  local sealed_file="$SCRIPT_DIR/sealed-secret.yaml"
+
+  # Base64 encode the value
+  local encoded_value
+  encoded_value=$(echo -n "$value" | base64 -w0)
+
+  # Write the secret YAML directly to the file
+  cat > "$file" <<EOF
+      apiVersion: v1
+      kind: Secret
+      type: Opaque
+      metadata:
+        name: $name
+        namespace: $namespace
+      data:
+        $key: $encoded_value
+EOF
+
+  echo "Secret YAML written to $file"
+
+  # Seal the secret
+  if command -v kubeseal >/dev/null 2>&1; then
+    kubeseal \
+      --controller-namespace kube-system \
+      --controller-name sealed-secrets-controller \
+      --format yaml \
+      < "$file" | tee "$sealed_file"
+    echo "Sealed secret written to $sealed_file"
+  else
+    echo "kubeseal not found. Install it to create sealed secrets."
+  fi
+}
+
