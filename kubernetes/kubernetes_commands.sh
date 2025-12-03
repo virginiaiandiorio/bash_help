@@ -1,30 +1,26 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-alias khelp='cat $HOME/repositories/bash_help/kubernetes/kubernetes_commands.sh'
-
 alias k='kubectl'
 alias kg='kubectl get'
 alias kgp='kubectl get pod'
 alias kd='kubectl describe'
 alias kdp='kubectl describe pod'
 alias kl='kubectl logs'
-
-
-# geoserver specific commands 
 alias gpods='kubectl get pods -n dsp-geoserver'
 alias gjob='kubectl get job -n dsp-geoserver'
 alias gjobd='kubectl describe job -n dsp-geoserver'
 alias gjobdelete='kubectl delete job sync-geoserver-config -n dsp-geoserver'
-alias jobapply='cd ~/repositories/geoserver && kubectl -n dsp-geoserver apply -f k8s_sync_pods/sync-dsp-geoserver-config.yaml'
-alias kroll='kubectl rollout restart deployment geoserver-read -n dsp-geoserver'
-
+alias gjobapply='cd ~/repositories/geoserver && kubectl -n dsp-geoserver apply -f k8s_sync_pods/sync-dsp-geoserver-config.yaml'
+alias kroll='kubectl rollout restart deployment'
+alias kgroll='kubectl rollout restart deployment geoserver-read -n dsp-geoserver'
 
 ks() {
+  local usage="Usage: ks <deployment> <replicas> [kubectl scale options]"
+  local example="Example: ks geoserver-ui 2 -n dsp-geoserver"
+
   if [[ "$1" == "--help" || "$1" == "-h" || $# -lt 2 ]]; then
-    echo "Usage: ks <deployment> <replicas> [kubectl scale options]"
-    echo "Example:"
-    echo "  ks geoserver-ui 2 -n dsp-geoserver"
-    echo "  # Runs: kubectl scale deployment geoserver-ui --replicas=2 -n dsp-geoserver"
+    echo "$usage"
+    echo "$example"
     return 0
   fi
 
@@ -37,11 +33,12 @@ ks() {
 }
 
 kclean() {
+  local usage="Usage: kclean <namespace> <state>"
+  local example="Example: kclean dsp-geoserver Error"
+
   if [[ "$1" == "--help" || "$1" == "-h" || $# -lt 2 ]]; then
-    echo "Usage: kclean <namespace> <state>"
-    echo "Example:"
-    echo "  kclean dsp-geoserver Error"
-    echo "  # Deletes all pods in dsp-geoserver with state 'Error'"
+    echo "$usage"
+    echo "$example"
     return 0
   fi
 
@@ -54,11 +51,12 @@ kclean() {
 }
 
 kdecrypt() {
+  local usage="Usage: kdecrypt <namespace> <secret-name> <key>"
+  local example="Example: kdecrypt dsp-cde-graphdb-endpoint-blue endpoint dsp"
+
   if [[ "$1" == "--help" || "$1" == "-h" || $# -lt 3 ]]; then
-    echo "Usage: ksecret <namespace> <secret-name> <key>"
-    echo "Example:"
-    echo "  kdecrypt dsp-cde-graphdb-endpoint-blue endpoint dsp"
-    echo "  # Prints the decoded value of 'endpoint' from the given secret"
+    echo "$usage"
+    echo "$example"
     return 0
   fi
 
@@ -72,8 +70,12 @@ kdecrypt() {
 }
 
 kencrypt() {
+  local usage="Usage: kencrypt <name> <namespace> <key> <value>"
+  local example="Example: kencrypt dsp-bathing-waters-swimfo dsp azurestorageaccountkey mysecretvalue"
+
   if [[ $# -lt 4 ]]; then
-    echo "Usage: kencrypt <name> <namespace> <key> <value>"
+    echo "$usage"
+    echo "$example"
     return 1
   fi
 
@@ -113,5 +115,24 @@ EOF
   else
     echo "kubeseal not found. Install it to create sealed secrets."
   fi
+}
+
+
+kman() {
+  echo "=== Kubernetes Aliases ==="
+  # Only reads aliases from the script file, doesn't run anything
+  grep -E '^alias k' "$SCRIPT_DIR/$(basename "${BASH_SOURCE[0]}")" | while read -r line; do
+    name=$(echo "$line" | cut -d '=' -f1 | awk '{print $2}')
+    cmd=$(echo "$line" | cut -d "'" -f2)
+    printf "%-15s -> %s\n" "$name" "$cmd"
+  done
+
+  echo
+  echo "=== Kubernetes Functions ==="
+  for fn in ks kclean kdecrypt kencrypt; do
+    printf "%-15s -> " "$fn"
+    help_output=$("$fn" --help 2>/dev/null | head -n2)
+    echo "$help_output" | paste -sd " | " -
+  done
 }
 
