@@ -121,7 +121,7 @@ EOF
 kman() {
   echo "=== Kubernetes Aliases ==="
   # Only reads aliases from the script file, doesn't run anything
-  grep -E '^alias k' "$SCRIPT_DIR/$(basename "${BASH_SOURCE[0]}")" | while read -r line; do
+  grep -E '^alias' "$SCRIPT_DIR/$(basename "${BASH_SOURCE[0]}")" | while read -r line; do
     name=$(echo "$line" | cut -d '=' -f1 | awk '{print $2}')
     cmd=$(echo "$line" | cut -d "'" -f2)
     printf "%-15s -> %s\n" "$name" "$cmd"
