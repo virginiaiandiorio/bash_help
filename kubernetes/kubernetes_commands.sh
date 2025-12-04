@@ -52,7 +52,7 @@ kclean() {
 
 kdecrypt() {
   local usage="Usage: kdecrypt <namespace> <secret-name> <key>"
-  local example="Example: kdecrypt dsp-cde-graphdb-endpoint-blue endpoint dsp"
+  local example="Example: kdecrypt dsp dsp-cde-graphdb-endpoint-blue endpoint"
 
   if [[ "$1" == "--help" || "$1" == "-h" || $# -lt 3 ]]; then
     echo "$usage"
@@ -60,9 +60,9 @@ kdecrypt() {
     return 0
   fi
 
-  local secret_name=$1
-  local key=$2
-  local namespace=$3
+  local namespace=$1
+  local secret_name=$2
+  local key=$3
 
   echo "Fetching '$key' from secret '$secret_name' in namespace '$namespace'..."
   kubectl get secret "$secret_name" -n "$namespace" -o jsonpath="{.data.$key}" | base64 --decode
@@ -71,7 +71,7 @@ kdecrypt() {
 
 kencrypt() {
   local usage="Usage: kencrypt <name> <namespace> <key> <value>"
-  local example="Example: kencrypt dsp-bathing-waters-swimfo dsp azurestorageaccountkey mysecretvalue"
+  local example="Example: kencrypt dsp dsp-bathing-waters-swimfo azurestorageaccountkey mysecretvalue"
 
   if [[ $# -lt 4 ]]; then
     echo "$usage"
@@ -79,8 +79,8 @@ kencrypt() {
     return 1
   fi
 
-  local name=$1
-  local namespace=$2
+  local namespace=$1
+  local name=$2
   local key=$3
   local value=$4
   local file="$SCRIPT_DIR/tempsecret.yaml"
